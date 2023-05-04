@@ -3,11 +3,10 @@ package de.rhaeus.dndsync;
 
 import android.content.SharedPreferences;
 import android.service.notification.NotificationListenerService;
+import android.service.notification.StatusBarNotification;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -37,6 +36,34 @@ public class DNDNotificationService extends NotificationListenerService {
     public void onListenerDisconnected() {
         Log.d(TAG, "listener disconnected");
         running = false;
+    }
+
+    @Override
+    public void onNotificationPosted(StatusBarNotification sbn){
+        onNotificationAddedOrRemovedCallDNDSync(sbn,5);
+    }
+
+    @Override
+    public void onNotificationRemoved(StatusBarNotification sbn){
+        onNotificationAddedOrRemovedCallDNDSync(sbn,6);
+    }
+
+    private void onNotificationAddedOrRemovedCallDNDSync(StatusBarNotification sbn, int interruptionFilter) {
+        if(sbn.getPackageName().equals("com.google.android.apps.wellbeing")) {
+            String title = sbn.getNotification().extras.getString("android.title");
+            if(title.equals("Bedtime mode is on")) {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                boolean syncBedTime = prefs.getBoolean("bedtime_sync_key", true);
+                //BedTime
+                if(syncBedTime) {
+                    new Thread(new Runnable() {
+                        public void run() {
+                            sendDNDSync(interruptionFilter);
+                        }
+                    }).start();
+                }
+            }
+        }
     }
 
     @Override

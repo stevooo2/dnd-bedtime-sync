@@ -1,5 +1,11 @@
-*.iml
 .gradle
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+
 /local.properties
 /.idea/caches
 /.idea/libraries

@@ -43,6 +43,9 @@ public class DNDSyncListenerService extends WearableListenerService {
             // 2 = INTERRUPTION_FILTER_PRIORITY
             // 3 = INTERRUPTION_FILTER_NONE (no notification passes)
             // 4 = INTERRUPTION_FILTER_ALARMS
+            // Custom
+            // 5 = BedTime Mode On
+            // 6 = BedTime Mode Off
             byte dndStatePhone = data[0];
             Log.d(TAG, "dndStatePhone: " + dndStatePhone);
 
@@ -56,13 +59,16 @@ public class DNDSyncListenerService extends WearableListenerService {
             byte currentDndState = (byte) filterState;
             Log.d(TAG, "currentDndState: " + currentDndState);
 
-            if (dndStatePhone != currentDndState) {
-                Log.d(TAG, "dndStatePhone != currentDndState: " + dndStatePhone + " != " + currentDndState);
+            if(dndStatePhone == 5 || dndStatePhone ==6) {
                 boolean useBedtimeMode = prefs.getBoolean("bedtime_key", true);
                 Log.d(TAG, "useBedtimeMode: " + useBedtimeMode);
                 if (useBedtimeMode) {
                     toggleBedtimeMode();
                 }
+            }
+
+            if (dndStatePhone != currentDndState) {
+                Log.d(TAG, "dndStatePhone != currentDndState: " + dndStatePhone + " != " + currentDndState);
                 // set DND anyways, also in case bedtime toggle does not work to have at least DND
                 if (mNotificationManager.isNotificationPolicyAccessGranted()) {
                     mNotificationManager.setInterruptionFilter(dndStatePhone);

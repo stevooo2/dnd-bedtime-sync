@@ -11,5 +11,6 @@
 
     <!-- Sync Preferences -->
     <string name="sync_title">Sync DND state to watch</string>
+    <string name="sync_bedtime_title">Sync Bedtime mode to watch</string>
 
 </resources>

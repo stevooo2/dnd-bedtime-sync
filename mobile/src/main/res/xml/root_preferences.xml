@@ -10,6 +10,12 @@
             app:defaultValue="true"
             app:title="@string/sync_title" />
 
+        <SwitchPreferenceCompat
+                app:key="bedtime_sync_key"
+                app:iconSpaceReserved="false"
+                app:defaultValue="true"
+                app:title="@string/sync_bedtime_title" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/permission_header"
