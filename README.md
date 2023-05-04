@@ -63,7 +63,5 @@ You can enable this by enabling the _Bedtime Mode_ Setting in the App.
 * If you enable the setting _Sync DND_ in the App a DND change on the watch will lead to a DND change on the phone
 * If you enable the setting _Vibration_ in the App the watch will vibrate when it receives a DND sync request from the phone
 
-# Feedback
-Feel free to contact me for questions, feature ideas or bugs and I will see if I can do something about it
-
-email: rhaeus.dev@gmail.com
+# Note
+All credit goes to the original developer (rhaeus) for the great app.
