@@ -65,4 +65,7 @@ You can enable this by enabling the _Bedtime Mode_ Setting in the App.
 * If you enable the setting _Vibration_ in the App the watch will vibrate when it receives a DND sync request from the phone
 
 # Note
+If you are unable to "Allow Notification Access" to the mobile app and it is faded, go the apps section in Settings, open DNDSync app, click 3 dots on top right and grant "Allow Restricted Settings" access.
+Now you'll be able to grant the Notification access to mobile app.
+
 All credit goes to the original developer (rhaeus) for the great app.
