@@ -3,17 +3,12 @@ package de.rhaeus.dndsync;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.PowerManager;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.util.Log;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
-
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
@@ -90,71 +85,6 @@ public class DNDSyncListenerService extends WearableListenerService {
             super.onMessageReceived(messageEvent);
         }
     }
-
-    private void toggleBedtimeMode() {
-        DNDSyncAccessService serv = DNDSyncAccessService.getSharedInstance();
-        if (serv == null) {
-            Log.d(TAG, "accessibility not connected");
-            // create a handler to post messages to the main thread
-            Handler mHandler = new Handler(getMainLooper());
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.acc_not_connected), Toast.LENGTH_LONG).show();
-                }
-            });
-            return;
-        }
-
-        Log.d(TAG, "accessibility connected. Perform toggle.");
-        // turn on screen
-        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP , "dndsync:MyWakeLock");
-        wakeLock.acquire(2*60*1000L /*2 minutes*/);
-
-        // create a handler to post messages to the main thread
-        Handler mHandler = new Handler(getMainLooper());
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), getResources().getString(R.string.bedtime_toggle), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-        // wait a bit before touch input to make sure screen is on
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // open quick panel
-        serv.swipeDown();
-
-        // wait for quick panel to open
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // click on the middle icon in the first row
-        serv.clickIcon1_2();
-
-        // wait a bit
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // close quick panel
-        serv.goBack();
-
-        wakeLock.release();
-    }
-
 
     private void vibrate() {
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);

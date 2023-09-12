@@ -55,12 +55,6 @@
                 app:summary="summary"
                 app:title="@string/secure_settings_permission_title" />
 
-<!--        <Preference-->
-<!--            app:iconSpaceReserved="false"-->
-<!--            app:key="acc_permission_key"-->
-<!--            app:summary="summary"-->
-<!--            app:title="@string/acc_permission_title" />-->
-
     </PreferenceCategory>
 
 </PreferenceScreen>

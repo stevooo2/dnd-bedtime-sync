@@ -32,7 +32,7 @@
 
     <string name="bedtime_title">Bedtime Mode</string>
     <string name="bedtime_summary_off">Copy Bedtime mode from phone</string>
-    <string name="bedtime_summary_on">Use Bedtime mode on DND sync</string>
+    <string name="bedtime_summary_on">Copy Bedtime mode from phone</string>
 
 
     <!-- Other Preferences -->
