@@ -13,8 +13,9 @@ import androidx.preference.SwitchPreferenceCompat;
 
 public class MainFragment extends PreferenceFragmentCompat {
     private Preference dndPref;
-    private SwitchPreferenceCompat bedtimePref;
+    private Preference bedtimePref;
     private Preference secureSettingsPref;
+    private Preference powerSaverMode;
 
 
 
@@ -25,6 +26,7 @@ public class MainFragment extends PreferenceFragmentCompat {
         dndPref = findPreference("dnd_permission_key");
         bedtimePref = findPreference("bedtime_key");
         secureSettingsPref = findPreference("secure_settings_permission_key");
+        powerSaverMode = findPreference("power_saver_key");
 
         dndPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {

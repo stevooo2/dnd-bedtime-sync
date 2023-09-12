@@ -22,6 +22,14 @@
             app:summaryOff="@string/bedtime_summary_off"
             app:title="@string/bedtime_title" />
 
+        <SwitchPreferenceCompat
+                app:iconSpaceReserved="false"
+                app:key="power_saver_key"
+                app:defaultValue="false"
+                app:summaryOn="@string/power_saver_summary_on"
+                app:summaryOff="@string/power_saver_summary_off"
+                app:title="@string/power_saver_title" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

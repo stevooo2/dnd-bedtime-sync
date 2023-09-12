@@ -56,23 +56,41 @@ public class DNDSyncListenerService extends WearableListenerService {
             Log.d(TAG, "currentDndState: " + currentDndState);
 
             if(dndStatePhone == 5 || dndStatePhone ==6) {
-                int bedTimeModeValue = (dndStatePhone ==5)?1:0;
                 boolean useBedtimeMode = prefs.getBoolean("bedtime_key", true);
                 Log.d(TAG, "useBedtimeMode: " + useBedtimeMode);
                 if (useBedtimeMode) {
-                    boolean success = Settings.Global.putInt(
+                    int bedTimeModeValue = (dndStatePhone ==5)?1:0;
+                    boolean bedtimeModeSuccess = Settings.Global.putInt(
                             getApplicationContext().getContentResolver(), "setting_bedtime_mode_running_state", bedTimeModeValue);
-                    if (success) {
+                    boolean zenModeSuccess = Settings.Global.putInt(
+                            getApplicationContext().getContentResolver(), "zen_mode", bedTimeModeValue);
+                    if (bedtimeModeSuccess && zenModeSuccess) {
                         Log.d(TAG, "Bedtime mode value toggled");
                     } else {
                         Log.d(TAG, "Bedtime mode toggle failed");
+                    }
+                    boolean usePowerSaverMode = prefs.getBoolean("power_saver_key", true);
+                    if(usePowerSaverMode) {
+                        boolean lowPower = Settings.Global.putInt(
+                                getApplicationContext().getContentResolver(), "low_power", bedTimeModeValue);
+                        boolean restrictedDevicePerformance = Settings.Global.putInt(
+                                getApplicationContext().getContentResolver(), "restricted_device_performance", bedTimeModeValue);
+                        boolean lowPowerBackDataOff = Settings.Global.putInt(
+                                getApplicationContext().getContentResolver(), "low_power_back_data_off", bedTimeModeValue);
+                        boolean smConnectivityDisable = Settings.Secure.putInt(
+                                getApplicationContext().getContentResolver(), "sm_connectivity_disable", bedTimeModeValue);
+                        if(lowPower && restrictedDevicePerformance && lowPowerBackDataOff && smConnectivityDisable) {
+                            Log.d(TAG, "Power Saver mode toggled");
+                        } else {
+                            Log.d(TAG, "Power Saver mode toggle failed");
+                        }
                     }
                 }
             }
 
             if ((dndStatePhone != currentDndState) && (dndStatePhone !=5 && dndStatePhone !=6)) {
                 Log.d(TAG, "dndStatePhone != currentDndState: " + dndStatePhone + " != " + currentDndState);
-                // set DND anyways, also in case bedtime toggle does not work to have at least DND
+                // set DND anyway, also in case bedtime toggle does not work to have at least DND
                 if (mNotificationManager.isNotificationPolicyAccessGranted()) {
                     mNotificationManager.setInterruptionFilter(dndStatePhone);
                     Log.d(TAG, "DND set to " + dndStatePhone);

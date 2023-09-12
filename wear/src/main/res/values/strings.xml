@@ -34,6 +34,10 @@
     <string name="bedtime_summary_off">Copy Bedtime mode from phone</string>
     <string name="bedtime_summary_on">Copy Bedtime mode from phone</string>
 
+    <string name="power_saver_title">Power Saver Mode</string>
+    <string name="power_saver_summary_off">Change power saver when Bedtime Mode is on</string>
+    <string name="power_saver_summary_on">Change power saver when Bedtime Mode is on</string>
+
 
     <!-- Other Preferences -->
     <!-- Vibrate -->
