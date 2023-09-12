@@ -16,6 +16,11 @@
     <string name="dnd_permission_not_allowed">DND access denied</string>
 
     <!-- Permission Preferences -->
+    <string name="secure_settings_permission_title">Secure Settings Permission</string>
+    <string name="secure_settings_permission_allowed">Secure Settings access granted</string>
+    <string name="secure_settings_permission_not_allowed">Secure Settings access denied</string>
+
+    <!-- Permission Preferences -->
     <string name="acc_permission_title">Accessibility Service</string>
     <string name="acc_permission_allowed">connected</string>
     <string name="acc_permission_not_allowed">not connected</string>
@@ -26,7 +31,7 @@
     <string name="sync_summary_on">Sync DND state to phone</string>
 
     <string name="bedtime_title">Bedtime Mode</string>
-    <string name="bedtime_summary_off">Use Bedtime mode on DND sync (requires Accessibility Service)</string>
+    <string name="bedtime_summary_off">Copy Bedtime mode from phone</string>
     <string name="bedtime_summary_on">Use Bedtime mode on DND sync</string>
 
 

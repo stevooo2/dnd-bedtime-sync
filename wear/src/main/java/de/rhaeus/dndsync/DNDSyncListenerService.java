@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -60,14 +61,21 @@ public class DNDSyncListenerService extends WearableListenerService {
             Log.d(TAG, "currentDndState: " + currentDndState);
 
             if(dndStatePhone == 5 || dndStatePhone ==6) {
+                int bedTimeModeValue = (dndStatePhone ==5)?1:0;
                 boolean useBedtimeMode = prefs.getBoolean("bedtime_key", true);
                 Log.d(TAG, "useBedtimeMode: " + useBedtimeMode);
                 if (useBedtimeMode) {
-                    toggleBedtimeMode();
+                    boolean success = Settings.Global.putInt(
+                            getApplicationContext().getContentResolver(), "setting_bedtime_mode_running_state", bedTimeModeValue);
+                    if (success) {
+                        Log.d(TAG, "Bedtime mode value toggled");
+                    } else {
+                        Log.d(TAG, "Bedtime mode toggle failed");
+                    }
                 }
             }
 
-            if (dndStatePhone != currentDndState) {
+            if ((dndStatePhone != currentDndState) && (dndStatePhone !=5 && dndStatePhone !=6)) {
                 Log.d(TAG, "dndStatePhone != currentDndState: " + dndStatePhone + " != " + currentDndState);
                 // set DND anyways, also in case bedtime toggle does not work to have at least DND
                 if (mNotificationManager.isNotificationPolicyAccessGranted()) {
