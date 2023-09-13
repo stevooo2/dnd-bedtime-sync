@@ -55,13 +55,15 @@ Note: This is only tested on my Galaxy Watch 4 and it might not work on other de
 This allows the app to listen to DND changes and changing the DND setting
 * scroll to the permission section and check if DND permission says _access granted_ (you might need to tap on the menu entry for it to update)
 * If you want to use the Bedtime mode feature you have to grant the app access to modify secure settings.
-Grant permission for Secure Setting access.
+Grant permission for Secure Setting access
+
   `adb shell pm grant de.rhaeus.dndsync android.permission.WRITE_SECURE_SETTINGS`
 * This allows the app to change BedTime mode directly without the need for accessibility.
 You can enable this by enabling the _Bedtime Mode_ Setting in the App.
 * _**IMPORTANT: Disable ADB debugging after you are done because it drains the battery!**_
 * If you enable the setting _Sync DND_ in the App a DND change on the watch will lead to a DND change on the phone
 * If you enable the setting _Bedtime Mode_ in the App the watch will copy the bedtime mode status of the phone, it's a 1-way sync.
+* If you enable the setting _Power Saver Mode_ in the App, the watch will turn on power saver mode whenever the _Bedtime Mode_ is synced from the phone.
 * If you enable the setting _Vibration_ in the App the watch will vibrate when it receives a DND sync request from the phone
 
 # Note
