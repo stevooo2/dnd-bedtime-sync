@@ -51,17 +51,17 @@ public class DNDNotificationService extends NotificationListenerService {
     private void onNotificationAddedOrRemovedCallDNDSync(StatusBarNotification sbn, int interruptionFilter) {
         if(sbn.getPackageName().equals("com.google.android.apps.wellbeing")) {
             String title = sbn.getNotification().extras.getString("android.title");
-            if(title.equals("Bedtime mode is on")) {
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-                boolean syncBedTime = prefs.getBoolean("bedtime_sync_key", true);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean syncBedTime = prefs.getBoolean("bedtime_sync_key", true);
+            if(syncBedTime && (title.contains("on") || title.contains("paused"))) {
+                int updatedInterruptionFilter;
                 //BedTime
-                if(syncBedTime) {
-                    new Thread(new Runnable() {
-                        public void run() {
-                            sendDNDSync(interruptionFilter);
-                        }
-                    }).start();
+                if (title.contains("paused")) {
+                    updatedInterruptionFilter = (interruptionFilter == 5) ? 6 : 5;
+                } else {
+                    updatedInterruptionFilter = interruptionFilter;
                 }
+                new Thread(() -> sendDNDSync(updatedInterruptionFilter)).start();
             }
         }
     }

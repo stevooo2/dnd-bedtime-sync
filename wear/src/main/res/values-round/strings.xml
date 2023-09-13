@@ -9,6 +9,8 @@
     <string name="permission_header">Permissions</string>
     <string name="sync_header">Sync</string>
     <string name="other_header">Other</string>
+    <string name="granted">Granted</string>
+    <string name="denied">Denied</string>
 
     <!-- Permission Preferences -->
     <string name="dnd_permission_title">DND Permission</string>

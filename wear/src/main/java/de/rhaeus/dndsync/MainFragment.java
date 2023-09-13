@@ -54,9 +54,9 @@ public class MainFragment extends PreferenceFragmentCompat {
         NotificationManager mNotificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
         boolean allowed = mNotificationManager.isNotificationPolicyAccessGranted();
         if (allowed) {
-            dndPref.setSummary(R.string.dnd_permission_allowed);
+            dndPref.setSummary(R.string.granted);
         } else {
-            dndPref.setSummary(R.string.dnd_permission_not_allowed);
+            dndPref.setSummary(R.string.denied);
         }
         return allowed;
     }
@@ -65,9 +65,9 @@ public class MainFragment extends PreferenceFragmentCompat {
         boolean allowed;
         allowed = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED;
         if (allowed) {
-            secureSettingsPref.setSummary(R.string.secure_settings_permission_allowed);
+            secureSettingsPref.setSummary(R.string.granted);
         } else {
-            secureSettingsPref.setSummary(R.string.secure_settings_permission_not_allowed);
+            secureSettingsPref.setSummary(R.string.denied);
         }
         return allowed;
     }
