@@ -5,10 +5,7 @@ import android.content.SharedPreferences;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
-import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.gms.wearable.CapabilityClient;
@@ -97,11 +94,7 @@ public class DNDNotificationService extends NotificationListenerService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean syncDnd = prefs.getBoolean("dnd_sync_key", true);
         if(syncDnd) {
-            new Thread(new Runnable() {
-                public void run() {
-                    sendDNDSync(interruptionFilter);
-                }
-            }).start();
+            new Thread(() -> sendDNDSync(interruptionFilter)).start();
         }
     }
 
@@ -109,7 +102,7 @@ public class DNDNotificationService extends NotificationListenerService {
         // https://developer.android.com/training/wearables/data/messages
 
         // search nodes for sync
-        CapabilityInfo capabilityInfo = null;
+        CapabilityInfo capabilityInfo;
         try {
             capabilityInfo = Tasks.await(
                     Wearable.getCapabilityClient(this).getCapability(
@@ -138,19 +131,9 @@ public class DNDNotificationService extends NotificationListenerService {
                     Task<Integer> sendTask =
                             Wearable.getMessageClient(this).sendMessage(node.getId(), DND_SYNC_MESSAGE_PATH, data);
 
-                    sendTask.addOnSuccessListener(new OnSuccessListener<Integer>() {
-                        @Override
-                        public void onSuccess(Integer integer) {
-                            Log.d(TAG, "send successful! Receiver node id: " + node.getId());
-                        }
-                    });
+                    sendTask.addOnSuccessListener(integer -> Log.d(TAG, "send successful! Receiver node id: " + node.getId()));
 
-                    sendTask.addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "send failed! Receiver node id: " + node.getId());
-                        }
-                    });
+                    sendTask.addOnFailureListener(e -> Log.d(TAG, "send failed! Receiver node id: " + node.getId()));
                 }
             }
         }

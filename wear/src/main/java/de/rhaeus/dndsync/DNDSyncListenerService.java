@@ -18,19 +18,11 @@ public class DNDSyncListenerService extends WearableListenerService {
 
     @Override
     public void onMessageReceived (@NonNull MessageEvent messageEvent) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, "onMessageReceived: " + messageEvent);
-        }
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (messageEvent.getPath().equalsIgnoreCase(DND_SYNC_MESSAGE_PATH)) {
-            Log.d(TAG, "received path: " + DND_SYNC_MESSAGE_PATH);
 
-            boolean vibrate = prefs.getBoolean("vibrate_key", false);
-            Log.d(TAG, "vibrate: " + vibrate);
-            if (vibrate) {
-                vibrate();
-            }
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            Log.d(TAG, "received path: " + DND_SYNC_MESSAGE_PATH);
 
             byte[] data = messageEvent.getData();
             // data[0] contains dnd mode of phone
@@ -55,47 +47,54 @@ public class DNDSyncListenerService extends WearableListenerService {
             byte currentDndState = (byte) filterState;
             Log.d(TAG, "currentDndState: " + currentDndState);
 
-            if(dndStatePhone == 5 || dndStatePhone ==6) {
-                boolean useBedtimeMode = prefs.getBoolean("bedtime_key", true);
+            if ((0 <= dndStatePhone && dndStatePhone <= 4) && dndStatePhone != currentDndState) {
+
+                Log.d(TAG, "dndStatePhone != currentDndState: " + dndStatePhone + " != " + currentDndState);
+
+                if (mNotificationManager.isNotificationPolicyAccessGranted()) {
+                    mNotificationManager.setInterruptionFilter(dndStatePhone);
+                    Log.d(TAG, "DND set to " + dndStatePhone);
+                } else {
+                    Log.d(TAG, "attempting to set DND but access not granted");
+                }
+
+                boolean vibrate = prefs.getBoolean("vibrate_key", false);
+                Log.d(TAG, "vibrate: " + vibrate);
+                if (vibrate) {
+                    vibrate();
+                }
+
+            } else if (dndStatePhone == 5 || dndStatePhone == 6) {
+
+                boolean useBedtimeMode = prefs.getBoolean("bedtime_key", false);
                 Log.d(TAG, "useBedtimeMode: " + useBedtimeMode);
                 if (useBedtimeMode) {
-                    int bedTimeModeValue = (dndStatePhone ==5)?1:0;
-                    boolean bedtimeModeSuccess = Settings.Global.putInt(
-                            getApplicationContext().getContentResolver(), "setting_bedtime_mode_running_state", bedTimeModeValue);
-                    boolean zenModeSuccess = Settings.Global.putInt(
-                            getApplicationContext().getContentResolver(), "zen_mode", bedTimeModeValue);
-                    if (bedtimeModeSuccess && zenModeSuccess) {
+
+                    int newSetting = (dndStatePhone == 5) ? 1 : 0;
+
+                    boolean bedtimeModeSuccess = changeBedtimeSetting(newSetting);
+                    if (bedtimeModeSuccess) {
                         Log.d(TAG, "Bedtime mode value toggled");
                     } else {
                         Log.d(TAG, "Bedtime mode toggle failed");
                     }
-                    boolean usePowerSaverMode = prefs.getBoolean("power_saver_key", true);
+
+                    boolean usePowerSaverMode = prefs.getBoolean("power_saver_key", false);
                     if(usePowerSaverMode) {
-                        boolean lowPower = Settings.Global.putInt(
-                                getApplicationContext().getContentResolver(), "low_power", bedTimeModeValue);
-                        boolean restrictedDevicePerformance = Settings.Global.putInt(
-                                getApplicationContext().getContentResolver(), "restricted_device_performance", bedTimeModeValue);
-                        boolean lowPowerBackDataOff = Settings.Global.putInt(
-                                getApplicationContext().getContentResolver(), "low_power_back_data_off", bedTimeModeValue);
-                        boolean smConnectivityDisable = Settings.Secure.putInt(
-                                getApplicationContext().getContentResolver(), "sm_connectivity_disable", bedTimeModeValue);
-                        if(lowPower && restrictedDevicePerformance && lowPowerBackDataOff && smConnectivityDisable) {
+
+                        boolean powerModeSuccess = changePowerModeSetting(newSetting);
+                        if(powerModeSuccess) {
                             Log.d(TAG, "Power Saver mode toggled");
                         } else {
                             Log.d(TAG, "Power Saver mode toggle failed");
                         }
                     }
                 }
-            }
 
-            if ((dndStatePhone != currentDndState) && (dndStatePhone !=5 && dndStatePhone !=6)) {
-                Log.d(TAG, "dndStatePhone != currentDndState: " + dndStatePhone + " != " + currentDndState);
-                // set DND anyway, also in case bedtime toggle does not work to have at least DND
-                if (mNotificationManager.isNotificationPolicyAccessGranted()) {
-                    mNotificationManager.setInterruptionFilter(dndStatePhone);
-                    Log.d(TAG, "DND set to " + dndStatePhone);
-                } else {
-                    Log.d(TAG, "attempting to set DND but access not granted");
+                boolean vibrate = prefs.getBoolean("vibrate_key", false);
+                Log.d(TAG, "vibrate: " + vibrate);
+                if (vibrate) {
+                    vibrate();
                 }
             }
 
@@ -104,9 +103,39 @@ public class DNDSyncListenerService extends WearableListenerService {
         }
     }
 
+    private boolean changeBedtimeSetting(int newSetting) {
+
+        boolean bedtimeModeSuccess = Settings.Global.putInt(
+                getApplicationContext().getContentResolver(), "setting_bedtime_mode_running_state", newSetting);
+        boolean zenModeSuccess = Settings.Global.putInt(
+                getApplicationContext().getContentResolver(), "zen_mode", newSetting);
+
+        return bedtimeModeSuccess && zenModeSuccess;
+    }
+
+    private boolean changePowerModeSetting(int newSetting) {
+
+        boolean lowPower = Settings.Global.putInt(
+                getApplicationContext().getContentResolver(), "low_power", newSetting);
+        boolean restrictedDevicePerformance = Settings.Global.putInt(
+                getApplicationContext().getContentResolver(), "restricted_device_performance", newSetting);
+
+        boolean lowPowerBackDataOff = Settings.Global.putInt(
+                getApplicationContext().getContentResolver(), "low_power_back_data_off", newSetting);
+        boolean smConnectivityDisable = Settings.Secure.putInt(
+                getApplicationContext().getContentResolver(), "sm_connectivity_disable", newSetting);
+
+        // screen timeout should be set to 10000 also, and ambient_tilt_to_wake should be set to 0
+        // but previous variables in those 2 cases must be stored and they do not seem to stick
+        // and they are not so much important tbh (ambient tilt to wake is disabled anyways)
+
+        return lowPower && restrictedDevicePerformance
+                && lowPowerBackDataOff && smConnectivityDisable;
+    }
+
     private void vibrate() {
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        v.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE));
+        v.vibrate(VibrationEffect.createOneShot(20, VibrationEffect.DEFAULT_AMPLITUDE));
     }
 
 }
