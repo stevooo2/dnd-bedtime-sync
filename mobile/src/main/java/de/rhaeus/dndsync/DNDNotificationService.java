@@ -38,30 +38,54 @@ public class DNDNotificationService extends NotificationListenerService {
         running = false;
     }
 
+    private boolean isWindDownNotification(StatusBarNotification sbn) {
+        return sbn.getPackageName().equals("com.google.android.apps.wellbeing") &&
+                sbn.getNotification().getChannelId().equals("wind_down_notifications");
+    }
+
     @Override
     public void onNotificationPosted(StatusBarNotification sbn){
-        onNotificationAddedOrRemovedCallDNDSync(sbn,5);
+
+        if(isWindDownNotification(sbn)) {
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean syncBedTime = prefs.getBoolean("bedtime_sync_key", true);
+
+            if(syncBedTime) {
+                // depending on the number of actions that can be done, bedtime mode
+                // could be in "pause mode" or "on mode":
+                // * If it is in "pause" mode, there is only one action ("Restart bedtime")
+                // * If it is in "on" mode, there are two actions possible ("Pause it" and "De-activate it")
+                boolean is_on = sbn.getNotification().actions.length == 2;
+                boolean is_paused = sbn.getNotification().actions.length == 1;
+
+                if (is_on) {
+                    // 5 means bedtime ON
+                    Log.d(TAG, "bedtime mode is on");
+                    int interruptionFilter = 5;
+                    new Thread(() -> sendDNDSync(interruptionFilter)).start();
+                } else if (is_paused) {
+                    // 6 means bedtime OFF
+                    Log.d(TAG, "bedtime mode is off");
+                    int interruptionFilter = 6;
+                    new Thread(() -> sendDNDSync(interruptionFilter)).start();
+                }
+            }
+        }
     }
 
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn){
-        onNotificationAddedOrRemovedCallDNDSync(sbn,6);
-    }
-
-    private void onNotificationAddedOrRemovedCallDNDSync(StatusBarNotification sbn, int interruptionFilter) {
-        if(sbn.getPackageName().equals("com.google.android.apps.wellbeing")) {
-            String title = sbn.getNotification().extras.getString("android.title");
+        // if notifications is removed, we want surely to disable bedtime mode
+        if(isWindDownNotification(sbn)) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             boolean syncBedTime = prefs.getBoolean("bedtime_sync_key", true);
-            if(syncBedTime && (title.contains("on") || title.contains("paused"))) {
-                int updatedInterruptionFilter;
-                //BedTime
-                if (title.contains("paused")) {
-                    updatedInterruptionFilter = (interruptionFilter == 5) ? 6 : 5;
-                } else {
-                    updatedInterruptionFilter = interruptionFilter;
-                }
-                new Thread(() -> sendDNDSync(updatedInterruptionFilter)).start();
+
+            if (syncBedTime) {
+                // 6 means bedtime OFF
+                Log.d(TAG, "bedtime mode is off");
+                int interruptionFilter = 6;
+                new Thread(() -> sendDNDSync(interruptionFilter)).start();
             }
         }
     }
