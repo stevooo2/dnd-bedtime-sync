@@ -62,7 +62,7 @@ Note: This is only tested on my **Galaxy Watch 4** and it might not work on othe
     * Note also the pair key, something like `123456`
     * Pair the watch with `adb pair 192.168.0.100:5555 123456` (***insert your value!***)
     * Now you will be brought back to the *Debug over WIFI* menu, note the **new port**, something like `:6666`
-    * Connect to the watch with `adb connect 192.168.0.100:6666` (The ip address stays the same, the port not!)
+    * Connect to the watch with `adb connect 192.168.0.100:6666` (The ip address stays the same, the port changes!)
 2. Install the app `dndsync-wear.apk` on the watch
     * Run `adb install dndsync-wear.apk`
 3. Grant permission for **DND access** (*This allows the app to listen to DND changes and to change the DND setting*)
@@ -78,6 +78,18 @@ Note: This is only tested on my **Galaxy Watch 4** and it might not work on othe
     * If you enable the setting ***Power Saver Mode*** in the App, the watch will turn on power saver mode whenever the *Bedtime Mode* is synced from the phone
     * If you enable the setting ***Vibration*** in the App, the watch will vibrate whenever it receives a sync request from the phone
 
-# Note
+## To do (developers)
+
+There are only two flags which the *Power saver mode* of this app does not enable but which are enabled
+by the *Power saver mode* of the watch itself:
+
+* Change screen timeout setting to *10 sec* when *Power Saver Mode* is enabled, just like it is if enabled via the watch
+* (Optional) For coherence, also the wake up the *watch by tilt* should be disabled via code. This is optional since it is 
+  disabled automatically whenever the low power mode is enabled and does not require setting manually the flag to 0, but still
+
+Pull requests are welcome!
+
+## Note
+
 If you are unable to "Allow Notification Access" to the mobile app and it is faded, go the apps section in Settings, open DNDSync app, click 3 dots on top right and grant "Allow Restricted Settings" access.
 Now you'll be able to grant the Notification access to mobile app.
