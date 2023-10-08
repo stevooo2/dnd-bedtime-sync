@@ -25,7 +25,7 @@ public class MainFragment extends PreferenceFragmentCompat {
                 if (!checkDNDPermission()) {
                     openDNDPermissionRequest();
                 } else {
-                    Toast.makeText(getContext(), "DND Permission allowed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "DND-Bedtime Permission allowed", Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
