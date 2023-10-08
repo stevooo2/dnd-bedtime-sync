@@ -60,7 +60,7 @@ Note: This is only tested on my **Galaxy Watch 4** and it might not work on othe
     * Click on `Pair new device`
     * Note the watch IP address and port, something like `192.168.0.100:5555` 
     * Note also the pair key, something like `123456`
-    * Pair the watch with `192.168.0.100:5555 123456` (***insert your value!***)
+    * Pair the watch with `adb pair 192.168.0.100:5555 123456` (***insert your value!***)
     * Now you will be brought back to the *Debug over WIFI* menu, note the **new port**, something like `:6666`
     * Connect to the watch with `adb connect 192.168.0.100:6666` (The ip address stays the same, the port not!)
 2. Install the app `dndsync-wear.apk` on the watch
