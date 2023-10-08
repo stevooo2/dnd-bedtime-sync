@@ -26,7 +26,7 @@ and to [@DreadedLama](https://github.com/DreadedLama) for the initial developing
 
 ### Phone
 
-<img src="/images/mobile.png" width="300">
+<img src="/images/mobile_updated.png" width="300">
 
 1. Install the app `dndsync-mobile.apk` on the phone via *adb*
     * Enable `USB Debugging` in the *Developer Options* of your phone and the connect it to the PC
