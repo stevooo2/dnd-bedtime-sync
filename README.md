@@ -2,11 +2,10 @@
 This App was developed to enable Do Not Disturb (DND) synchronization between my Pixel phone and the Galaxy Watch 4 
 since this option was only available if paired with a Samsung phone.
 
-If installed on phone and watch it enables either a 1-way sync or a 2-way sync, depending on the preferences.
+If installed on phone and watch it enables either a 1-way sync or a 2-way sync of DND, depending on the preferences.
 I also added the functionality to automatically toggle Bedtime Mode. Use case: At night I put my phone into DND and I want my watch to automatically enable Bedtime Mode.
-This functionality is realized via an Accessibility Service, since I couldn't find how to enable it programmatically (any hints are highly appreciated).
+This functionality is realized via modifying secure settings.
 
-NOTE: For Bedtime mode toggle to work it is important that on the watch the Bedtime Mode button is on the first page of quick settings and the middle button in the first row!
 
 Part of this project is inspired by [blundens](https://github.com/blunden/DoNotDisturbSync) work, please check their GitHub if you want to know more.
 
@@ -55,15 +54,20 @@ Note: This is only tested on my Galaxy Watch 4 and it might not work on other de
 `adb shell cmd notification allow_listener de.rhaeus.dndsync/de.rhaeus.dndsync.DNDNotificationService`  
 This allows the app to listen to DND changes and changing the DND setting
 * scroll to the permission section and check if DND permission says _access granted_ (you might need to tap on the menu entry for it to update)
-* _**IMPORTANT: Disable ADB debugging after you are done because it drains the battery!**_
-* If you want to use the Bedtime mode feature you have to enable the Accessibility service for the app. Clicking on _Accessibility Service_ will open the setting on your watch. 
-Go to _Installed Services_ and enable _DNDSync_. The App will use this to simulate the following touch events on the screen: 
-swipe down to open Quick Settings Panel, click the middle icon of the first row (put Bedtime Mode here) and finally close the panel.
+* If you want to use the Bedtime mode feature you have to grant the app access to modify secure settings.
+Grant permission for Secure Setting access
+
+  `adb shell pm grant de.rhaeus.dndsync android.permission.WRITE_SECURE_SETTINGS`
+* This allows the app to change BedTime mode directly without the need for accessibility.
 You can enable this by enabling the _Bedtime Mode_ Setting in the App.
+* _**IMPORTANT: Disable ADB debugging after you are done because it drains the battery!**_
 * If you enable the setting _Sync DND_ in the App a DND change on the watch will lead to a DND change on the phone
+* If you enable the setting _Bedtime Mode_ in the App the watch will copy the bedtime mode status of the phone, it's a 1-way sync.
+* If you enable the setting _Power Saver Mode_ in the App, the watch will turn on power saver mode whenever the _Bedtime Mode_ is synced from the phone.
 * If you enable the setting _Vibration_ in the App the watch will vibrate when it receives a DND sync request from the phone
 
-# Feedback
-Feel free to contact me for questions, feature ideas or bugs and I will see if I can do something about it
+# Note
+If you are unable to "Allow Notification Access" to the mobile app and it is faded, go the apps section in Settings, open DNDSync app, click 3 dots on top right and grant "Allow Restricted Settings" access.
+Now you'll be able to grant the Notification access to mobile app.
 
-email: rhaeus.dev@gmail.com
+All credit goes to the original developer (rhaeus) for the great app.

@@ -3,16 +3,12 @@ package de.rhaeus.dndsync;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.PowerManager;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.provider.Settings;
 import android.util.Log;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
-
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
@@ -43,6 +39,9 @@ public class DNDSyncListenerService extends WearableListenerService {
             // 2 = INTERRUPTION_FILTER_PRIORITY
             // 3 = INTERRUPTION_FILTER_NONE (no notification passes)
             // 4 = INTERRUPTION_FILTER_ALARMS
+            // Custom
+            // 5 = BedTime Mode On
+            // 6 = BedTime Mode Off
             byte dndStatePhone = data[0];
             Log.d(TAG, "dndStatePhone: " + dndStatePhone);
 
@@ -56,14 +55,42 @@ public class DNDSyncListenerService extends WearableListenerService {
             byte currentDndState = (byte) filterState;
             Log.d(TAG, "currentDndState: " + currentDndState);
 
-            if (dndStatePhone != currentDndState) {
-                Log.d(TAG, "dndStatePhone != currentDndState: " + dndStatePhone + " != " + currentDndState);
+            if(dndStatePhone == 5 || dndStatePhone ==6) {
                 boolean useBedtimeMode = prefs.getBoolean("bedtime_key", true);
                 Log.d(TAG, "useBedtimeMode: " + useBedtimeMode);
                 if (useBedtimeMode) {
-                    toggleBedtimeMode();
+                    int bedTimeModeValue = (dndStatePhone ==5)?1:0;
+                    boolean bedtimeModeSuccess = Settings.Global.putInt(
+                            getApplicationContext().getContentResolver(), "setting_bedtime_mode_running_state", bedTimeModeValue);
+                    boolean zenModeSuccess = Settings.Global.putInt(
+                            getApplicationContext().getContentResolver(), "zen_mode", bedTimeModeValue);
+                    if (bedtimeModeSuccess && zenModeSuccess) {
+                        Log.d(TAG, "Bedtime mode value toggled");
+                    } else {
+                        Log.d(TAG, "Bedtime mode toggle failed");
+                    }
+                    boolean usePowerSaverMode = prefs.getBoolean("power_saver_key", true);
+                    if(usePowerSaverMode) {
+                        boolean lowPower = Settings.Global.putInt(
+                                getApplicationContext().getContentResolver(), "low_power", bedTimeModeValue);
+                        boolean restrictedDevicePerformance = Settings.Global.putInt(
+                                getApplicationContext().getContentResolver(), "restricted_device_performance", bedTimeModeValue);
+                        boolean lowPowerBackDataOff = Settings.Global.putInt(
+                                getApplicationContext().getContentResolver(), "low_power_back_data_off", bedTimeModeValue);
+                        boolean smConnectivityDisable = Settings.Secure.putInt(
+                                getApplicationContext().getContentResolver(), "sm_connectivity_disable", bedTimeModeValue);
+                        if(lowPower && restrictedDevicePerformance && lowPowerBackDataOff && smConnectivityDisable) {
+                            Log.d(TAG, "Power Saver mode toggled");
+                        } else {
+                            Log.d(TAG, "Power Saver mode toggle failed");
+                        }
+                    }
                 }
-                // set DND anyways, also in case bedtime toggle does not work to have at least DND
+            }
+
+            if ((dndStatePhone != currentDndState) && (dndStatePhone !=5 && dndStatePhone !=6)) {
+                Log.d(TAG, "dndStatePhone != currentDndState: " + dndStatePhone + " != " + currentDndState);
+                // set DND anyway, also in case bedtime toggle does not work to have at least DND
                 if (mNotificationManager.isNotificationPolicyAccessGranted()) {
                     mNotificationManager.setInterruptionFilter(dndStatePhone);
                     Log.d(TAG, "DND set to " + dndStatePhone);
@@ -76,71 +103,6 @@ public class DNDSyncListenerService extends WearableListenerService {
             super.onMessageReceived(messageEvent);
         }
     }
-
-    private void toggleBedtimeMode() {
-        DNDSyncAccessService serv = DNDSyncAccessService.getSharedInstance();
-        if (serv == null) {
-            Log.d(TAG, "accessibility not connected");
-            // create a handler to post messages to the main thread
-            Handler mHandler = new Handler(getMainLooper());
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.acc_not_connected), Toast.LENGTH_LONG).show();
-                }
-            });
-            return;
-        }
-
-        Log.d(TAG, "accessibility connected. Perform toggle.");
-        // turn on screen
-        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP , "dndsync:MyWakeLock");
-        wakeLock.acquire(2*60*1000L /*2 minutes*/);
-
-        // create a handler to post messages to the main thread
-        Handler mHandler = new Handler(getMainLooper());
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), getResources().getString(R.string.bedtime_toggle), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-        // wait a bit before touch input to make sure screen is on
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // open quick panel
-        serv.swipeDown();
-
-        // wait for quick panel to open
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // click on the middle icon in the first row
-        serv.clickIcon1_2();
-
-        // wait a bit
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // close quick panel
-        serv.goBack();
-
-        wakeLock.release();
-    }
-
 
     private void vibrate() {
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
