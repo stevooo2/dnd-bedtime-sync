@@ -84,7 +84,7 @@ There are only two flags which the *Power saver mode* of this app does not enabl
 by the *Power saver mode* of the watch itself:
 
 * Change screen timeout setting to *10 sec* when *Power Saver Mode* is enabled, just like it is if enabled via the watch
-* (Optional) For coherence, also the wake up the *watch by tilt* should be disabled via code. This is optional since it is 
+* (Optional) For coherence, also the *wake up the watch by tilt* should be disabled via code. This is optional since it is 
   disabled automatically whenever the low power mode is enabled and does not require setting manually the flag to 0, but still
 
 Pull requests are welcome!
