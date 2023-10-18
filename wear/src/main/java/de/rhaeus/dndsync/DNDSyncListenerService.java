@@ -106,7 +106,7 @@ public class DNDSyncListenerService extends WearableListenerService {
     private boolean changeBedtimeSetting(int newSetting) {
 
         boolean bedtimeModeSuccess = Settings.Global.putInt(
-                getApplicationContext().getContentResolver(), "setting_bedtime_mode_running_state", newSetting);
+                getApplicationContext().getContentResolver(), "bedtime_mode", newSetting);
         boolean zenModeSuccess = Settings.Global.putInt(
                 getApplicationContext().getContentResolver(), "zen_mode", newSetting);
 
