@@ -20,7 +20,7 @@ and to [@DreadedLama](https://github.com/DreadedLama) for the initial developing
 
 ***Manual installation is required. The use of ADB is required. (*Don't worry, it's very easy!*)***
 
-* Download the latest `.apk` files from the ['Releases' section](https://github.com/Silleellie/dnd-bedtime-sync/releases) (`dndsync-mobile.apk` and `dndsync-wear.apk`)
+* Download the latest `.apk` files from the ['Releases' section](https://github.com/lazerl0rd/dnd-bedtime-sync/releases) (`dndsync-mobile.apk` and `dndsync-wear.apk`)
 * Be sure to enable notifications for Bedtime mode of the Digital Wellbeing app on your phone (*They are by default*)
     * This app knows that bedtime mode is activated when its notification pops up (since there's no public API for the *Digital Wellbeing* app)
 
